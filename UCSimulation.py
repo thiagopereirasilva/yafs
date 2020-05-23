@@ -10,7 +10,7 @@ from yafs.population import *
 from yafs.topology import Topology
 from yafs.stats import Stats
 from yafs.placement import ClusterPlacement, EdgePlacement, NoPlacementOfModules, Placement
-from yafs.distribution import deterministicDistribution
+from yafs.distribution import deterministicDistribution, deterministicDistributionStartPoint
 from yafs.utils import fractional_selectivity
 
 from UCSelection import MinimunPath, MinPath_RoundRobin
@@ -36,11 +36,12 @@ def create_application():
     m_mlt_flt = Message("M.MLT", "MLTTask", "FLTTask", instructions=1*10^6, bytes=2000)
     m_flt_dlt = Message("M.FLT", "FLTTask", "DLTTask", instructions=1*10^6, bytes=2000)
 
-    # WHO generrates 
+    # Add in the application those messages that come from pure sources (sensors). This distinction allows them to be controlled by the (:mod:`Population`) algorithm
     a.add_source_messages(m_cam_mlt)
 
     # dDistribution = deterministicDistribution(name="Deterministic", time=100)
-    # a.add_service_source("MLTTask", dDistribution, m_mlt_flt)
+    # TODO: Não entendi o comportamente disso
+    a.add_service_source("Camera", m_mlt_flt)
 
     # MODULE SERVICES
     a.add_service_module("MLTTask", m_cam_mlt, m_mlt_flt, fractional_selectivity,  threshold=1.0)
@@ -152,6 +153,7 @@ def main(simulated_time):
 
     #In addition, a source includes a distribution function:
     dDistribution = deterministicDistribution(name="Deterministic",time=10)
+    # delayDistribution = deterministicDistributionStartPoint(400, 100, name="DelayDeterministic")
     
     # number:quantidade de replicas
     pop.set_src_control({"model": "camera", "number":1,"message": app.get_message("M.Cam"), "distribution": dDistribution})
