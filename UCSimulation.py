@@ -3,6 +3,8 @@ import argparse
 import time
 import numpy as np
 import sys as sys
+import matplotlib.pyplot as plt
+import networkx as nx
 
 from yafs.core import Sim
 from yafs.application import Application,Message
@@ -39,9 +41,10 @@ def create_application():
     # Add in the application those messages that come from pure sources (sensors). This distinction allows them to be controlled by the (:mod:`Population`) algorithm
     a.add_source_messages(m_cam_mlt)
 
+    # Este nao eh o caso de usar um service_source - VER EXEMPLO DE VRGAME
+    # Um service_source normalmente modela um Module que produz dados de controle, por exemplo.
     # dDistribution = deterministicDistribution(name="Deterministic", time=100)
-    # TODO: Não entendi o comportamente disso
-    a.add_service_source("Camera", m_mlt_flt)
+    # a.add_service_source("Camera", dDistribution, m_mlt_flt)
 
     # MODULE SERVICES
     a.add_service_module("MLTTask", m_cam_mlt, m_mlt_flt, fractional_selectivity,  threshold=1.0)
@@ -132,7 +135,7 @@ def main(simulated_time):
     """
     # MINHA IMPLEMENTACAO DO ALGORITMO PARA PLACEMENT.
     # UTILIZA A PROPRIEDADE model:node
-    placement = UCPlacement("")
+    placement = UCPlacement(name="UCPlacement")
 
     # Para criar replicas dos servicos
     placement.scaleService({"MLTTask": 1, "FLTTask":1, "DLTTask":1})
@@ -149,7 +152,7 @@ def main(simulated_time):
     #     model (str): identifies the device or devices where the sink is linked
     #     number (int): quantity of sinks linked in each device
     #     module (str): identifies the module from the app who receives the messages
-    pop.set_sink_control({"model": "sink","number":1,"module":app.get_sink_modules()})
+    pop.set_sink_control({"model": "sink","number":0,"module":app.get_sink_modules()})
 
     #In addition, a source includes a distribution function:
     dDistribution = deterministicDistribution(name="Deterministic",time=10)
@@ -179,6 +182,15 @@ def main(simulated_time):
     s.run(stop_time,show_progress_monitor=False)
 
     s.draw_allocated_topology() # for debugging
+    # Tentativa frustrada de melhorar a representacao da topologia e salvar em um arquivo
+    # G = s.topology.G
+    # pos = nx.spring_layout(G)
+    # nx.draw(G, pos, node_color='r', edge_color='b', with_labels=True)
+    # # for p in pos:  # raise text positions
+    # #     pos[p][1] += 0.07
+    # nx.draw_networkx_labels(G, pos)
+    # # plt.show()
+    # plt.savefig('books_read.png')
 
 
 if __name__ == '__main__':

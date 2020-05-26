@@ -2,6 +2,7 @@
 from yafs.selection import Selection
 import networkx as nx
 from networkx.algorithms.flow import edmonds_karp
+import matplotlib.pyplot as plt
 
 class MinimunPath(Selection):
 
@@ -56,7 +57,7 @@ def graph2digraph(graph):
     myDigraph = nx.DiGraph()
     myDigraph.add_nodes_from(graph.nodes(data=True))
     myDigraph.add_edges_from(graph.edges(data=True))
-
+    
     # for node1, node2, data in G.edges(data=True):
     #     print(data['weight'])
 
